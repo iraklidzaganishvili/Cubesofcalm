@@ -15,6 +15,8 @@
     import { onMount } from 'svelte';
     // import { dimensions } from './store.js';
     let size;
+    let spawn;
+    let goal;
     onMount(() => {
         // dimensions.set({
         //     width: gameboard.offsetWidth,
@@ -25,12 +27,10 @@
         let canvas = document.getElementById('gameboard');
         let ctx = canvas.getContext('2d');
         size = canvas.getBoundingClientRect();
+        let blocklength = size.width/40;
         canvas.width = size.width * 10;
         canvas.height = size.height * 10;
         ctx.scale(10, 10);
-        ctx.beginPath();
-        ctx.rect(20, 20, 300, 300); 
-        ctx.fill();
         
         //Styling stuff
         window.addEventListener('resize', resize);
@@ -48,5 +48,68 @@
             }
         }
         resize();
+
+        //Drawing unmoving
+        function drawwalls(arrayof800){
+            for (var y = 0; y < 20; y++){
+                for (var x = 0; x < 40; x++){
+                    switch(arrayof800[y*40+x]) {
+                        case 1:
+                            ctx.fillStyle = 'black';
+                            ctx.fillRect(x*blocklength, y*blocklength, blocklength, blocklength); 
+                        break;
+                        case 2:
+                            ctx.fillStyle = 'red'; 
+                            ctx.fillRect(x*blocklength, y*blocklength, blocklength/2, blocklength/2);
+                            spawn = {x:x, y:y};
+                        break;
+                        case 3:
+                            ctx.fillStyle = 'blue'; 
+                            ctx.fillRect(x*blocklength, y*blocklength, blocklength, blocklength);
+                            goal = {x:x, y:y};
+                        break;
+                    }
+                } 
+            }
+        }
+
+        //map
+        let mapgen =  [2,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+                       0,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+                       0,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+                       0,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+                       0,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+                       0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+                       1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+                       1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+                       1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+                       1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+                       1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+                       1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+                       1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+                       1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+                       1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+                       1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+                       1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+                       1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+                       1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+                       1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,3,
+                       ]
+        drawwalls(mapgen);
+
+        //player and collision
+
+        function spawnplayer(){
+            ctx.fillStyle = 'green'; 
+            ctx.fillRect(spawn.x*blocklength, spawn.y*blocklength, blocklength/2, blocklength/2);
+        }
+        spawnplayer();
+
+        let mousePosition;
+        canvas.addEventListener('mousemove', function(evt) {
+            ctx.clearRect(mousePosition.x, mousePosition.y, blocklength/2, blocklength/2)
+            mousePosition = getMousePos(canvas, evt);
+        });
+
     });
 </script>

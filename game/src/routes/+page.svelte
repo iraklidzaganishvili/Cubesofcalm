@@ -5,10 +5,8 @@
 <script>
 
 import Gameboard from '../Components/Gameboard.svelte'
-import T from '../Components/Player.svelte'
 
 </script>
 <style>
 </style>
 <Gameboard />
-<T />
