@@ -59,12 +59,12 @@
                             ctx.fillRect(x*blocklength, y*blocklength, blocklength, blocklength); 
                         break;
                         case 2:
-                            ctx.fillStyle = 'red'; 
+                            ctx.fillStyle = 'red';
                             ctx.fillRect(x*blocklength, y*blocklength, blocklength/2, blocklength/2);
                             spawn = {x:x, y:y};
                         break;
                         case 3:
-                            ctx.fillStyle = 'blue'; 
+                            ctx.fillStyle = 'blue';
                             ctx.fillRect(x*blocklength, y*blocklength, blocklength, blocklength);
                             goal = {x:x, y:y};
                         break;
@@ -99,17 +99,25 @@
 
         //player and collision
 
+        function getMousePos(canvas, evt) {
+            const rect = canvas.getBoundingClientRect();
+            return {
+                x: evt.clientX - rect.left,
+                y: evt.clientY - rect.top
+            };
+            }
         function spawnplayer(){
             ctx.fillStyle = 'green'; 
             ctx.fillRect(spawn.x*blocklength, spawn.y*blocklength, blocklength/2, blocklength/2);
         }
         spawnplayer();
 
-        let mousePosition;
+        let mousePosition = [spawn.x, spawn.y];
         canvas.addEventListener('mousemove', function(evt) {
-            ctx.clearRect(mousePosition.x, mousePosition.y, blocklength/2, blocklength/2)
+            ctx.clearRect(mousePosition.x-blocklength/4, mousePosition.y-blocklength/4, blocklength/2, blocklength/2)
             mousePosition = getMousePos(canvas, evt);
+            ctx.fillStyle = 'green'; 
+            ctx.fillRect(mousePosition.x-blocklength/4, mousePosition.y-blocklength/4, blocklength/2, blocklength/2);
         });
-
     });
 </script>
