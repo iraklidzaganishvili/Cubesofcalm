@@ -112,12 +112,30 @@
         }
         spawnplayer();
 
-        let mousePosition = [spawn.x, spawn.y];
-        canvas.addEventListener('mousemove', function(evt) {
-            ctx.clearRect(mousePosition.x-blocklength/4, mousePosition.y-blocklength/4, blocklength/2, blocklength/2)
-            mousePosition = getMousePos(canvas, evt);
-            ctx.fillStyle = 'green'; 
-            ctx.fillRect(mousePosition.x-blocklength/4, mousePosition.y-blocklength/4, blocklength/2, blocklength/2);
+        //player
+        var player = {
+            x: spawn.x,
+            y: spawn.y,
+            move: blocklength,
+            color: green,
+        }
+
+        //colision
+        canvas.addEventListener('keydown', function(evt) {        
+            switch(evt.key){
+                case 'w':
+                    box.y = box.y-box.move;
+                    break;
+                case 's':
+                    box.y = box.y+box.move;
+                    break;
+                case 'a':
+                    box.x = box.x-box.move;
+                    break;
+                case 'd':
+                    box.x = box.x+box.move;
+                    break;
+            }
         });
     });
 </script>
