@@ -17,6 +17,7 @@
     onMount(() => {
         let spawn;
         let goal;
+        
         let player = {
             x: spawn.x,
             y: spawn.y,
@@ -29,6 +30,10 @@
             a: false,
             s: false,
             d: false
+        }
+
+        let game = {
+            speed: 1000/60
         }
 
         //map
@@ -123,10 +128,9 @@
             ctx.clearRect(player.x, player.y, blocklength/2, blocklength/2);
             ctx.fillStyle = player.color;
             ctx.fillRect(player.x, player.y, blocklength/2, blocklength/2);
-        }
-        switch(keys) {
+            switch(keys) {
             case w:
-
+                
                 break;
             case s:
 
@@ -137,7 +141,8 @@
             case d:
 
                 break;
-                    }
-        setInterval(gameloop, gameseed);
+        }
+        }
+        setInterval(gameloop, game.speed);
     });
 </script>
