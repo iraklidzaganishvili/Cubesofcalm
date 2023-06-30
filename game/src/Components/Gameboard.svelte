@@ -18,23 +18,16 @@
         let spawn;
         let goal;
         
-        let player = {
-            x: spawn.x,
-            y: spawn.y,
-            move: blocklength/2,
-            color: "green",
-        }
-        
         let keys = {
             w: false,
             a: false,
             s: false,
             d: false
-        }
+        };
 
         let game = {
-            speed: 1000/60
-        }
+            speed: 1000/20
+        };
 
         //map
         let mapgen =  [0,0,0,0,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
@@ -109,6 +102,14 @@
         }
         drawwalls(mapgen);
 
+        let player = {
+            x: spawn.x,
+            y: spawn.y,
+            vx: 0,
+            vy: 0,
+            move: blocklength/4,
+            color: "green",
+        };
         //spawn
         function spawnplayer(){
             ctx.fillStyle = player.color; 
@@ -124,25 +125,41 @@
         });
 
         //gameloop
+        
+        var fps = 30;
+        var now;
+        var then = Date.now();
+        var interval = 1000/fps;
+        var delta;
+        
         function gameloop(){
+
+            now = Date.now();
+            delta = now - then;
+            if (delta > interval) {
+                then = now - (delta % interval);
+                animatecharacter();
+            }
+            requestAnimationFrame(gameloop);
+        }
+        function animatecharacter(){
             ctx.clearRect(player.x, player.y, blocklength/2, blocklength/2);
+            if(keys.w == true){
+                player.y = player.y-player.move;
+            }
+            if(keys.s == true){
+                player.y = player.y+player.move;
+            }
+            if(keys.a == true){
+                player.x = player.x-player.move;
+            }
+            if(keys.d == true){
+                player.x = player.x+player.move;
+            }
             ctx.fillStyle = player.color;
             ctx.fillRect(player.x, player.y, blocklength/2, blocklength/2);
-            switch(keys) {
-            case w:
-                
-                break;
-            case s:
-
-                break;
-            case a:
-
-                break;
-            case d:
-
-                break;
         }
-        }
-        setInterval(gameloop, game.speed);
+        requestAnimationFrame(gameloop);
+
     });
 </script>
