@@ -15,35 +15,21 @@
     import { onMount } from 'svelte';
     // import { dimensions } from './store.js';
     onMount(() => {
-        let spawn;
-        let goal;
-        
-        let keys = {
-            w: false,
-            a: false,
-            s: false,
-            d: false
-        };
-
-        let game = {
-            speed: 1000/20
-        };
-
         //map
         let mapgen =  [0,0,0,0,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
                        0,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
                        0,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
                        0,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
                        0,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-                       0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-                       1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-                       1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-                       1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-                       1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,
-                       1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-                       1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-                       1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-                       1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+                       0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+                       1,1,1,1,1,0,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+                       1,1,1,1,1,0,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+                       1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+                       1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,
+                       1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+                       1,1,1,1,1,0,1,1,1,1,1,1,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+                       1,1,1,1,1,0,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+                       1,1,1,1,1,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
                        1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
                        1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
                        1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
@@ -55,11 +41,28 @@
         let canvas = document.getElementById('gameboard');
         let ctx = canvas.getContext('2d');
         let size = canvas.getBoundingClientRect();
-        let blocklength = size.width/40;
         canvas.width = size.width * 10;
         canvas.height = size.height * 10;
         ctx.scale(10, 10);
+
+        let spawn;
+        let goal;
         
+        let keys = {
+            w: false,
+            a: false,
+            s: false,
+            d: false
+        };
+
+        let game = {
+            speed: 1000/20,
+            w:80,
+            h:40,
+            blocklength: 0,
+        };
+        game.blocklength = size.width/game.w;
+
         //Styling stuff
         window.addEventListener('resize', resize);
         function resize(){
@@ -78,42 +81,43 @@
         resize();
 
         //Drawing unmoving
-        function drawwalls(arrayof800){
-            for (var y = 0; y < 20; y++){
-                for (var x = 0; x < 40; x++){
-                    switch(arrayof800[y*40+x]) {
+        function drawwalls(){
+            for (var y = 0; y < game.h; y++){
+                for (var x = 0; x < game.w; x++){
+                    switch(mapgen[y*game.w+x]) {
                         case 1:
                             ctx.fillStyle = 'black';
-                            ctx.fillRect(x*blocklength, y*blocklength, blocklength, blocklength); 
+                            ctx.fillRect(x*game.blocklength, y*game.blocklength, game.blocklength, game.blocklength); 
                             break;
                         case 2:
                             ctx.fillStyle = 'red';
-                            ctx.fillRect(x*blocklength, y*blocklength, blocklength/2, blocklength/2);
-                            spawn = {x:x*blocklength, y:y*blocklength};
+                            ctx.fillRect(x*game.blocklength, y*game.blocklength, game.blocklength, game.blocklength);
+                            spawn = {x:x*game.blocklength, y:y*game.blocklength};
                             break;
                         case 3:
                             ctx.fillStyle = 'blue';
-                            ctx.fillRect(x*blocklength, y*blocklength, blocklength, blocklength);
+                            ctx.fillRect(x*game.blocklength, y*game.blocklength, game.blocklength, game.blocklength);
                             goal = {x:x, y:y};
                             break;
                     }
                 } 
             }
         }
-        drawwalls(mapgen);
+        drawwalls();
 
         let player = {
+            size: game.blocklength, 
             x: spawn.x,
             y: spawn.y,
             vx: 0,
             vy: 0,
-            move: blocklength/8,
+            move: game.blocklength/4,
             color: "green",
         };
         //spawn
         function spawnplayer(){
             ctx.fillStyle = player.color; 
-            ctx.fillRect(spawn.x, spawn.y, blocklength/2, blocklength/2);
+            ctx.fillRect(spawn.x, spawn.y, player.size, player.size);
         }
         spawnplayer();
 
@@ -143,11 +147,13 @@
                 // x=x+1;
                 then = now - (delta % interval);
                 animatecharacter();
+                checkcollision();
             }
             requestAnimationFrame(gameloop);
         }
+
         function animatecharacter(){
-            ctx.clearRect(player.x, player.y, blocklength/2, blocklength/2);
+            ctx.clearRect(player.x, player.y, player.size, player.size);
             if(keys.w == true){
                 player.y = player.y-player.move;
             }
@@ -161,9 +167,15 @@
                 player.x = player.x+player.move;
             }
             ctx.fillStyle = player.color;
-            ctx.fillRect(player.x, player.y, blocklength/2, blocklength/2);
+            ctx.fillRect(player.x, player.y, player.size, player.size);
         }
         requestAnimationFrame(gameloop);
+
+        let middle;
+        function checkcollision(){
+            middle = [player.x+player.size/2, player.y+player.size/2];
+            // blockcords
+        }
 
     });
 </script>
