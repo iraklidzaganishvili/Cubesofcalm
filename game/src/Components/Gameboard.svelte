@@ -1,185 +1,207 @@
-<style>
-#gameboard{
-    width:80rem;
-    height:40rem;
-    position: absolute;
-    left:50%;
-    top:50%;
-    transform: translate(-50%, -50%);
-    background-color:aquamarine;
-    outline: none;
-}
-</style>
-<canvas bind:this={canvas} id='gameboard'/>
-<svelte:window on:keydown={handleKeyDown} on:keyup={handlekeyUp}/>
 <script>
-    import { onMount } from 'svelte';
-    // import { dimensions } from './store.js';
-        //map
-        let canvas;
-        function handleKeyDown(event){
-            keys[event.key] = true;
-        }
+	import { onMount } from 'svelte';
+	import { get } from 'svelte/store';
+	import * as stores from './levels.js';
 
-        function handlekeyUp(event){
-            keys[event.key] = false;
-        }
-        let spawn;
-        let goal;
-        
-        let keys = {
-            w: false,
-            a: false,
-            s: false,
-            d: false
-        };
+	//map
+	let mapgen = get(stores.mapgen);
+    mapgen = mapgen.map1;
+    console.log(mapgen);
 
-        let game = {
-            speed: 1000/20,
-            w:80,
-            h:40,
-            blocklength: 0,
-        };
+	let canvas;
+	function handleKeyDown(event) {
+		keys[event.key] = true;
+	}
 
-        onMount(() => {
+	function handlekeyUp(event) {
+		keys[event.key] = false;
+	}
+	let spawn;
+	let goal;
 
-        let mapgen =  [-1,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,1,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,1,1,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,1,1,1,0,0,0,0,0,1,1,1,1,0,0,0,0,1,1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,1,0,1,1,1,0,0,1,1,0,1,1,1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,1,1,1,0,1,1,1,0,1,1,0,0,1,1,1,0,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,1,1,0,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,0,1,1,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,1,1,1,1,1,1,1,1,1,1,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
-];  
+	let keys = {
+		w: false,
+		a: false,
+		s: false,
+		d: false
+	};
 
-        let ctx = canvas.getContext('2d');
-        let size = canvas.getBoundingClientRect();
-        canvas.width = size.width * 10;
-        canvas.height = size.height * 10;
-        ctx.scale(10, 10);
+	let game = {
+		speed: 1000 / 20,
+		w: 80,
+		h: 40,
+		blocklength: 0
+	};
 
-        //blocklength
-        game.blocklength = size.width/game.w;
+	onMount(() => {
+		let ctx = canvas.getContext('2d');
+		let size = canvas.getBoundingClientRect();
+		canvas.width = size.width * 10;
+		canvas.height = size.height * 10;
+		ctx.scale(10, 10);
 
-        //Styling stuff
-        window.addEventListener('resize', resize);
-        function resize(){
-            let viewportWidth = window.innerWidth;
-            let viewportHeight = window.innerHeight;
-            if (canvas.offsetWidth > viewportWidth || canvas.offsetHeight > viewportHeight) {
-                canvas.style.left = "0%";
-                canvas.style.top = "0%";
-                canvas.style.transform = "translate(0%, 0%)";
-            } else {
-                canvas.style.left = "50%";
-                canvas.style.top = "50%";
-                canvas.style.transform = "translate(-50%, -50%)";
-            }
-        }
-        resize();
+		//blocklength
+		game.blocklength = size.width / game.w;
 
-        //Drawing unmoving
-        function drawwalls(){
-            for (var y = 0; y < game.h; y++){
-                for (var x = 0; x < game.w; x++){
-                    switch(mapgen[y*game.w+x]) {
-                        case 1:
-                            ctx.fillStyle = 'black';
-                            ctx.fillRect(x*game.blocklength, y*game.blocklength, game.blocklength, game.blocklength); 
-                            break;
-                        case -1:
-                            ctx.fillStyle = 'red';
-                            ctx.fillRect(x*game.blocklength, y*game.blocklength, game.blocklength, game.blocklength);
-                            spawn = {x:x*game.blocklength, y:y*game.blocklength};
-                            break;
-                        case 3:
-                            ctx.fillStyle = 'blue';
-                            ctx.fillRect(x*game.blocklength, y*game.blocklength, game.blocklength, game.blocklength);
-                            goal = {x:x, y:y};
-                            break;
-                    }
-                } 
-            }
-        }
-        drawwalls();
+		//Styling stuff
+		window.addEventListener('resize', resize);
+		function resize() {
+			let viewportWidth = window.innerWidth;
+			let viewportHeight = window.innerHeight;
+			if (canvas.offsetWidth > viewportWidth || canvas.offsetHeight > viewportHeight) {
+				canvas.style.left = '0%';
+				canvas.style.top = '0%';
+				canvas.style.transform = 'translate(0%, 0%)';
+			} else {
+				canvas.style.left = '50%';
+				canvas.style.top = '50%';
+				canvas.style.transform = 'translate(-50%, -50%)';
+			}
+		}
+		resize();
 
-        let player = {
-            size: game.blocklength, 
-            x: spawn.x,
-            y: spawn.y,
-            vx: 0,
-            vy: 0,
-            move: game.blocklength/4,
-            color: "green",
-        };
-        //spawn
-        function spawnplayer(){
-            ctx.fillStyle = player.color; 
-            ctx.fillRect(spawn.x, spawn.y, player.size, player.size);
-            ctx.clearRect(player.x, player.y, player.size, player.size)
-            player.x = spawn.x;
-            player.y = spawn.y;
-            drawwalls();
-            keys = {w:false, a:false, s:false, d:false};
-        }
-        spawnplayer();
+		//Drawing unmoving
+		function drawwalls() {
+			for (var y = 0; y < game.h; y++) {
+				for (var x = 0; x < game.w; x++) {
+					switch (mapgen[y * game.w + x]) {
+						case 1:
+							ctx.fillStyle = 'black';
+							ctx.fillRect(
+								x * game.blocklength,
+								y * game.blocklength,
+								game.blocklength,
+								game.blocklength
+							);
+							break;
+						case -1:
+							ctx.fillStyle = 'red';
+							ctx.fillRect(
+								x * game.blocklength,
+								y * game.blocklength,
+								game.blocklength,
+								game.blocklength
+							);
+							spawn = { x: x * game.blocklength, y: y * game.blocklength };
+							break;
+						case 3:
+							ctx.fillStyle = 'blue';
+							ctx.fillRect(
+								x * game.blocklength,
+								y * game.blocklength,
+								game.blocklength,
+								game.blocklength
+							);
+							goal = { x: x, y: y };
+							break;
+					}
+				}
+			}
+		}
+		drawwalls();
 
-        //gameloop        
-        let fps = 30;
-        let now;
-        let then = Date.now();
-        let interval = 1000/fps;
-        let delta;
-        // let x = 0;
-        // setInterval(() => {
-        //         console.log(x);
-        //         x=0;
-        //     }, 1000);
-        function gameloop(){
-            now = Date.now();
-            delta = now - then;
-            if (delta > interval) {
-                // x=x+1;
-                then = now - (delta % interval);
-                animatecharacter();
-                checkcollision();
-            }
-            requestAnimationFrame(gameloop);
-        }
+		let player = {
+			size: game.blocklength,
+			x: spawn.x,
+			y: spawn.y,
+			vx: 0,
+			vy: 0,
+			move: game.blocklength / 4,
+			color: 'green'
+		};
+		//spawn
+		function spawnplayer() {
+			ctx.fillStyle = player.color;
+			ctx.fillRect(spawn.x, spawn.y, player.size, player.size);
+			ctx.clearRect(player.x, player.y, player.size, player.size);
+			player.x = spawn.x;
+			player.y = spawn.y;
+			drawwalls();
+			keys = { w: false, a: false, s: false, d: false };
+		}
+		spawnplayer();
 
-        //movement 
-        function animatecharacter(){
-            ctx.clearRect(player.x, player.y, player.size, player.size);
-            if(keys.w == true){
-                player.y = player.y-player.move;
-            }
-            if(keys.s == true){
-                player.y = player.y+player.move;
-            }
-            if(keys.a == true){
-                player.x = player.x-player.move;
-            }
-            if(keys.d == true){
-                player.x = player.x+player.move;
-            }
-            ctx.fillStyle = player.color;
-            ctx.fillRect(player.x, player.y, player.size, player.size);
-        }
-        requestAnimationFrame(gameloop);
+		//gameloop
+		let fps = 30;
+		let now;
+		let then = Date.now();
+		let interval = 1000 / fps;
+		let delta;
+		// let x = 0;
+		// setInterval(() => {
+		//         console.log(x);
+		//         x=0;
+		//     }, 1000);
+		function gameloop() {
+			now = Date.now();
+			delta = now - then;
+			if (delta > interval) {
+				// x=x+1;
+				then = now - (delta % interval);
+				animatecharacter();
+				checkcollision();
+			}
+			requestAnimationFrame(gameloop);
+		}
 
-        //colision logic
-        let bordcord = {
-            minXMinY:0,
-            minXMaxY:0,
-            maXXminY:0,
-            maXXmaxY:0
-        };
-        function checkcollision(){
-            bordcord.minXMinY = Math.floor(player.y/game.blocklength)*game.w + Math.floor(player.x/game.blocklength);
-            bordcord.minXMaxY = Math.floor(player.y/game.blocklength)*game.w + Math.ceil(player.x/game.blocklength);
-            bordcord.maXXminY = Math.ceil(player.y/game.blocklength)*game.w + Math.floor(player.x/game.blocklength);
-            bordcord.maXXmaxY = Math.ceil(player.y/game.blocklength)*game.w + Math.ceil(player.x/game.blocklength);
-            // console.log(bordcord);
-            for (let element in bordcord){
-                if (mapgen[bordcord[element]] > 0){
-                    spawnplayer();
-                    console.log(bordcord[element]);
-                }
-            }
-        }
-    });
+		//movement
+		function animatecharacter() {
+			ctx.clearRect(player.x, player.y, player.size, player.size);
+			if (keys.w == true) {
+				player.y = player.y - player.move;
+			}
+			if (keys.s == true) {
+				player.y = player.y + player.move;
+			}
+			if (keys.a == true) {
+				player.x = player.x - player.move;
+			}
+			if (keys.d == true) {
+				player.x = player.x + player.move;
+			}
+			ctx.fillStyle = player.color;
+			ctx.fillRect(player.x, player.y, player.size, player.size);
+		}
+		requestAnimationFrame(gameloop);
+
+		//colision logic
+		let bordcord = {
+			minXMinY: 0,
+			minXMaxY: 0,
+			maXXminY: 0,
+			maXXmaxY: 0
+		};
+		function checkcollision() {
+			bordcord.minXMinY =
+				Math.floor(player.y / game.blocklength) * game.w + Math.floor(player.x / game.blocklength);
+			bordcord.minXMaxY =
+				Math.floor(player.y / game.blocklength) * game.w + Math.ceil(player.x / game.blocklength);
+			bordcord.maXXminY =
+				Math.ceil(player.y / game.blocklength) * game.w + Math.floor(player.x / game.blocklength);
+			bordcord.maXXmaxY =
+				Math.ceil(player.y / game.blocklength) * game.w + Math.ceil(player.x / game.blocklength);
+			// console.log(bordcord);
+			for (let element in bordcord) {
+				if (mapgen[bordcord[element]] > 0) {
+					spawnplayer();
+					console.log(bordcord[element]);
+				}
+			}
+		}
+	});
 </script>
+
+<canvas bind:this={canvas} id="gameboard" />
+<svelte:window on:keydown={handleKeyDown} on:keyup={handlekeyUp} />
+
+<style>
+	#gameboard {
+		width: 80rem;
+		height: 40rem;
+		position: absolute;
+		left: 50%;
+		top: 50%;
+		transform: translate(-50%, -50%);
+		background-color: aquamarine;
+	}
+</style>
