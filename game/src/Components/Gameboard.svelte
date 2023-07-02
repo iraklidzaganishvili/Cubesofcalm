@@ -4,9 +4,10 @@
 	import * as stores from './levels.js';
 
 	//map
-	let mapgen = get(stores.mapgen);
-    mapgen = mapgen.map1;
-    console.log(mapgen);
+    let level = 0;
+	let allmaps = get(stores.mapgen);
+    let mapgen;
+    mapgen = allmaps.maps[level];
 
 	let canvas;
 	function handleKeyDown(event) {
@@ -17,8 +18,6 @@
 		keys[event.key] = false;
 	}
 	let spawn;
-	let goal;
-
 	let keys = {
 		w: false,
 		a: false,
@@ -61,7 +60,7 @@
 		resize();
 
 		//Drawing unmoving
-		function drawwalls() {
+		function drawMap() {
 			for (var y = 0; y < game.h; y++) {
 				for (var x = 0; x < game.w; x++) {
 					switch (mapgen[y * game.w + x]) {
@@ -84,7 +83,7 @@
 							);
 							spawn = { x: x * game.blocklength, y: y * game.blocklength };
 							break;
-						case 3:
+						case -2:
 							ctx.fillStyle = 'blue';
 							ctx.fillRect(
 								x * game.blocklength,
@@ -92,13 +91,12 @@
 								game.blocklength,
 								game.blocklength
 							);
-							goal = { x: x, y: y };
 							break;
 					}
 				}
 			}
 		}
-		drawwalls();
+		drawMap();
 
 		let player = {
 			size: game.blocklength,
@@ -116,10 +114,9 @@
 			ctx.clearRect(player.x, player.y, player.size, player.size);
 			player.x = spawn.x;
 			player.y = spawn.y;
-			drawwalls();
+			drawMap();
 			keys = { w: false, a: false, s: false, d: false };
 		}
-		spawnplayer();
 
 		//gameloop
 		let fps = 30;
@@ -184,10 +181,23 @@
 			for (let element in bordcord) {
 				if (mapgen[bordcord[element]] > 0) {
 					spawnplayer();
-					console.log(bordcord[element]);
-				}
+					// console.log(bordcord[element]);
+				}else {
+                    if(mapgen[bordcord[element]] == -2){
+                        level = level+1;
+                        nextlevel(level);
+                        spawnplayer();       
+                    }
+                }
 			}
 		}
+        function nextlevel(level){
+            mapgen = allmaps.maps[level];
+            console.log('level', level);
+            drawMap();
+            spawnplayer();
+            console.log('map ', mapgen);
+        }
 	});
 </script>
 
