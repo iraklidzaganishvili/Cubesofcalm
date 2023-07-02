@@ -4,10 +4,10 @@
 	import * as stores from './levels.js';
 
 	//map
-    let level = 0;
+	let level = 0;
 	let allmaps = get(stores.mapgen);
-    let mapgen;
-    mapgen = allmaps.maps[level];
+	let mapgen;
+	mapgen = allmaps.maps[level];
 
 	let canvas;
 	function handleKeyDown(event) {
@@ -31,7 +31,6 @@
 		h: 40,
 		blocklength: 0
 	};
-
 	onMount(() => {
 		let ctx = canvas.getContext('2d');
 		let size = canvas.getBoundingClientRect();
@@ -61,6 +60,7 @@
 
 		//Drawing unmoving
 		function drawMap() {
+            ctx.clearRect(0, 0, game.w * game.blocklength, game.h * game.blocklength);
 			for (var y = 0; y < game.h; y++) {
 				for (var x = 0; x < game.w; x++) {
 					switch (mapgen[y * game.w + x]) {
@@ -104,7 +104,7 @@
 			y: spawn.y,
 			vx: 0,
 			vy: 0,
-			move: game.blocklength / 4,
+			move: game.blocklength / 8,
 			color: 'green'
 		};
 		//spawn
@@ -117,23 +117,22 @@
 			drawMap();
 			keys = { w: false, a: false, s: false, d: false };
 		}
-
 		//gameloop
-		let fps = 30;
+		let fps = 60;
 		let now;
 		let then = Date.now();
 		let interval = 1000 / fps;
 		let delta;
-		// let x = 0;
-		// setInterval(() => {
-		//         console.log(x);
-		//         x=0;
-		//     }, 1000);
-		function gameloop() {
+		let fpscounter = 0;
+		setInterval(() => {
+		        console.log('fps:' + fpscounter);
+		        fpscounter = 0;
+		    }, 1000);
+		function gameloop() {   
 			now = Date.now();
 			delta = now - then;
 			if (delta > interval) {
-				// x=x+1;
+				fpscounter = fpscounter+1;
 				then = now - (delta % interval);
 				animatecharacter();
 				checkcollision();
@@ -143,7 +142,7 @@
 
 		//movement
 		function animatecharacter() {
-			ctx.clearRect(player.x, player.y, player.size, player.size);
+            ctx.clearRect(player.x, player.y, player.size, player.size);
 			if (keys.w == true) {
 				player.y = player.y - player.move;
 			}
@@ -168,6 +167,7 @@
 			maXXminY: 0,
 			maXXmaxY: 0
 		};
+		var HitNextLVLOnce = true;
 		function checkcollision() {
 			bordcord.minXMinY =
 				Math.floor(player.y / game.blocklength) * game.w + Math.floor(player.x / game.blocklength);
@@ -177,27 +177,27 @@
 				Math.ceil(player.y / game.blocklength) * game.w + Math.floor(player.x / game.blocklength);
 			bordcord.maXXmaxY =
 				Math.ceil(player.y / game.blocklength) * game.w + Math.ceil(player.x / game.blocklength);
-			// console.log(bordcord);
 			for (let element in bordcord) {
 				if (mapgen[bordcord[element]] > 0) {
 					spawnplayer();
-					// console.log(bordcord[element]);
-				}else {
-                    if(mapgen[bordcord[element]] == -2){
-                        level = level+1;
-                        nextlevel(level);
-                        spawnplayer();       
-                    }
-                }
+				} else {
+					if (mapgen[bordcord[element]] == -2 && HitNextLVLOnce == true) {
+						HitNextLVLOnce = false;
+						level = level + 1;
+						nextlevel(level);
+						spawnplayer();
+					}
+				}
 			}
+			HitNextLVLOnce = true;
 		}
-        function nextlevel(level){
-            mapgen = allmaps.maps[level];
-            console.log('level', level);
-            drawMap();
-            spawnplayer();
-            console.log('map ', mapgen);
-        }
+		function nextlevel(level) {
+			mapgen = allmaps.maps[level];
+			console.log('level:' + level);
+			drawMap();
+			spawnplayer();
+		}
+        window.level = nextlevel;
 	});
 </script>
 
