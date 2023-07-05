@@ -125,6 +125,7 @@
 		let delta;
 		let fpscounter = 0;
 		let arrayPos = [0];
+		let smoother = [0];
 		let movingBlockArray = [[0,1,2,3,4,5,6,5,4,3,2,1,0]];
 		setInterval(() => {
 		        console.log('fps:' + fpscounter);
@@ -138,7 +139,7 @@
 				then = now - (delta % interval);
 
 				//runs every frame 
-				drawMovingBlock(movingBlockArray[0][arrayPos[0]], movingBlockArray[0][arrayPos[0]-1], 'red', movingBlockArray[0].length, 0);
+				drawMovingBlock(movingBlockArray[0][arrayPos[0]], movingBlockArray[0][arrayPos[0]-1], 'red', movingBlockArray[0].length, 0, 8);
 				animatecharacter();
 				checkcollision();
 			}
@@ -209,9 +210,7 @@
 		let blockX;
 		let prevBlockY;
 		let prevBlockX;
-		let test = 0;
-		var abacus = 0;
-		function drawMovingBlock (blockpos, previousBlockpos, blockColor, moveLength, PosInArray){
+		function drawMovingBlock (blockpos, previousBlockpos, blockColor, moveLength, posInArray, blockSpeed){
 			ctx.clearRect(prevBlockX*game.blocklength, prevBlockY*game.blocklength, game.blocklength, game.blocklength); // I made clearrect work with trial and error and im proud of it... I banged my head on this for like 30 minutes WHY DOES IT WORK NOW WTF
 			mapgen[previousBlockpos] = 0;
 
@@ -221,20 +220,20 @@
 			prevBlockX = previousBlockpos - prevBlockY * game.w;
 
 			ctx.fillStyle = blockColor;
-			ctx.fillRect((prevBlockX+(blockX-prevBlockX)/20*test)*game.blocklength, (prevBlockY+(blockY-prevBlockY)/8*test)*game.blocklength, game.blocklength, game.blocklength);
+			ctx.fillRect((prevBlockX+(blockX-prevBlockX)/blockSpeed*smoother[posInArray])*game.blocklength, (prevBlockY+(blockY-prevBlockY)/blockSpeed*smoother[posInArray])*game.blocklength, game.blocklength, game.blocklength);
 			mapgen[blockpos] = 1;
-			if (arrayPos[PosInArray] == moveLength){
-				arrayPos[PosInArray] = 0;
+			if (arrayPos[posInArray] == moveLength){
+				arrayPos[posInArray] = 0;
 			}
-			test = test + 1;
-			if (test == 20){
-				test = 0;
-				arrayPos[PosInArray] = arrayPos[PosInArray] + 1;
+			if (smoother[posInArray] == blockSpeed){
+				smoother[posInArray] = 0;
+				arrayPos[posInArray] = arrayPos[posInArray] + 1;
 			}
-				abacus = 0;
-			abacus = abacus +1;
+			smoother[posInArray] = smoother[posInArray] + 1;
 		}
 	});
+
+	// todo: fix 1 frame despawn, fix hitbox by using game.blocklength instead of arraynum
 </script>
 
 <canvas bind:this={canvas} id="gameboard" />
