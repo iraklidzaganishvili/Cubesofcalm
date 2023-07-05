@@ -72,7 +72,7 @@
 								game.blocklength,
 								game.blocklength
 							);
-							break;
+							break; 
 						case -1:
 							ctx.fillStyle = 'red';
 							ctx.fillRect(
@@ -92,6 +92,10 @@
 								game.blocklength
 							);
 							break;
+						default:
+							if(mapgen[y * game.w + x] > 1 && mapgen[y * game.w + x] < 100){
+								// array[mapgen[y * game.w + x]].push(y * game.w + x);
+							}
 					}
 				}
 			}
@@ -118,24 +122,35 @@
 			keys = { w: false, a: false, s: false, d: false };
 		}
 		//gameloop
+		let abacus = 0;
 		let fps = 60;
 		let now;
 		let then = Date.now();
 		let interval = 1000 / fps;
 		let delta;
 		let fpscounter = 0;
+		let arrayPos = [0];
+		let movingBlockArray = [[0,1,2,3,4,5,6,100,100,100,6,5,4,3,2,1,0]];
 		setInterval(() => {
 		        console.log('fps:' + fpscounter);
 		        fpscounter = 0;
 		    }, 1000);
-		function gameloop() {   
+		function gameloop() {
 			now = Date.now();
 			delta = now - then;
 			if (delta > interval) {
 				fpscounter = fpscounter+1;
 				then = now - (delta % interval);
+
+				//runs every frame 
+				abacus = abacus +1;
+				if (abacus == 10){
+				drawMovingBlock(movingBlockArray[0][arrayPos[0]], movingBlockArray[0][arrayPos[0]-1], 1, 'red', movingBlockArray[0].length, 0);
+				abacus = 0;
+			}
 				animatecharacter();
 				checkcollision();
+
 			}
 			requestAnimationFrame(gameloop);
 		}
@@ -178,7 +193,7 @@
 			bordcord.maXXmaxY =
 				Math.ceil(player.y / game.blocklength) * game.w + Math.ceil(player.x / game.blocklength);
 			for (let element in bordcord) {
-				if (mapgen[bordcord[element]] > 0) {
+				if (mapgen[bordcord[element]] == 1) {
 					spawnplayer();
 				} else {
 					if (mapgen[bordcord[element]] == -2 && HitNextLVLOnce == true) {
@@ -198,6 +213,24 @@
 			spawnplayer();
 		}
         window.level = nextlevel;
+
+		//block that moves to all array positions
+		let blockY;
+		let blockX;
+		function drawMovingBlock (blockpos, previousBlockpos, blockSize, blockColor, moveLength, n){
+			ctx.clearRect(blockX*game.blocklength, blockY*game.blocklength, game.blocklength*blockSize, game.blocklength*blockSize);
+			mapgen[previousBlockpos] = 0;
+			blockY = Math.floor(blockpos/game.w);
+			blockX = blockpos - blockY * game.w;
+			ctx.fillStyle = blockColor;
+			ctx.fillRect(blockX*game.blocklength, blockY*game.blocklength, game.blocklength*blockSize, game.blocklength*blockSize);
+			mapgen[blockpos] = 1;
+			if (arrayPos[n] == moveLength){
+				arrayPos[n] = 0;
+			}
+			arrayPos[n] = arrayPos[n] + 1;
+
+		}
 	});
 </script>
 
