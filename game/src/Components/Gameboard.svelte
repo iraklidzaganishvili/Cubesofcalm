@@ -210,10 +210,9 @@
 		let prevBlockY;
 		let prevBlockX;
 		let test = 0;
-		let clearx;
-		let cleary;
+		var abacus = 0;
 		function drawMovingBlock (blockpos, previousBlockpos, blockColor, moveLength, PosInArray){
-			ctx.clearRect((prevBlockX+(blockX-prevBlockX)/8*test)*game.blocklength, (prevBlockY+(blockY-prevBlockY)/8*test)*game.blocklength, game.blocklength, game.blocklength);
+			ctx.clearRect(prevBlockX*game.blocklength, prevBlockY*game.blocklength, game.blocklength, game.blocklength); // I made clearrect work with trial and error and im proud of it... I banged my head on this for like 30 minutes WHY DOES IT WORK NOW WTF
 			mapgen[previousBlockpos] = 0;
 
 			blockY = Math.floor(blockpos/game.w);
@@ -222,17 +221,18 @@
 			prevBlockX = previousBlockpos - prevBlockY * game.w;
 
 			ctx.fillStyle = blockColor;
-			ctx.fillRect((prevBlockX+(blockX-prevBlockX)/8*test)*game.blocklength, (prevBlockY+(blockY-prevBlockY)/8*test)*game.blocklength, game.blocklength, game.blocklength);
+			ctx.fillRect((prevBlockX+(blockX-prevBlockX)/20*test)*game.blocklength, (prevBlockY+(blockY-prevBlockY)/8*test)*game.blocklength, game.blocklength, game.blocklength);
 			mapgen[blockpos] = 1;
 			if (arrayPos[PosInArray] == moveLength){
 				arrayPos[PosInArray] = 0;
 			}
 			test = test + 1;
-			if (test == 8){
+			if (test == 20){
 				test = 0;
 				arrayPos[PosInArray] = arrayPos[PosInArray] + 1;
 			}
-
+				abacus = 0;
+			abacus = abacus +1;
 		}
 	});
 </script>
