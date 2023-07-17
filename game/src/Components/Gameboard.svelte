@@ -141,7 +141,7 @@
 				//runs every frame 
 				drawMovingBlock(movingBlockArray[0][arrayPos[0]], movingBlockArray[0][arrayPos[0]-1], 'red', movingBlockArray[0].length, 0, 8);
 				animatecharacter();
-				checkcollision();
+				checkCollision();
 			}
 			requestAnimationFrame(gameloop);
 		}
@@ -174,7 +174,7 @@
 			maXXmaxY: 0
 		};
 		var HitNextLVLOnce = true;
-		function checkcollision() {
+		function checkCollision() {
 			bordcord.minXMinY =
 				Math.floor(player.y / game.blocklength) * game.w + Math.floor(player.x / game.blocklength);
 			bordcord.minXMaxY =
@@ -184,7 +184,7 @@
 			bordcord.maXXmaxY =
 				Math.ceil(player.y / game.blocklength) * game.w + Math.ceil(player.x / game.blocklength);
 			for (let element in bordcord) {
-				if (mapgen[bordcord[element]] > 0) {
+				if (mapgen[bordcord[element]] == 1) {
 					spawnplayer();
 				} else {
 					if (mapgen[bordcord[element]] == -2 && HitNextLVLOnce == true) {
@@ -197,6 +197,7 @@
 			}
 			HitNextLVLOnce = true;
 		}
+
 		function nextlevel(level) {
 			mapgen = allmaps.maps[level];
 			console.log('level:' + level);
@@ -225,11 +226,16 @@
 			if (arrayPos[posInArray] == moveLength){
 				arrayPos[posInArray] = 0;
 			}
+			
+			smoother[posInArray] = smoother[posInArray] + 1;
 			if (smoother[posInArray] == blockSpeed){
 				smoother[posInArray] = 0;
 				arrayPos[posInArray] = arrayPos[posInArray] + 1;
 			}
-			smoother[posInArray] = smoother[posInArray] + 1;
+
+			if(blockX < player.x + game.blocklength && blockX + game.blocklength > player.x && blockY < player.y + game.blocklength && game.blocklength + blockY > player.y) {
+				alert('hi');
+			}
 		}
 	});
 
