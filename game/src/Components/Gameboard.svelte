@@ -127,19 +127,28 @@
 		let arrayPos = [0];
 		let smoother = [0];
 		let movingBlockArray = [[0,1,2,3,4,5,6,5,4,3,2,1,0]];
+		let deltatime = 1;
+
+		let lastFrameTimeMs = Date.now();
+		let FrameTimeMs;
 		setInterval(() => {
 		        console.log('fps:' + fpscounter);
 		        fpscounter = 0;
 		    }, 1000);
-		function gameloop() {   
+		function gameloop() { 
 			now = Date.now();
 			delta = now - then;
 			if (delta > interval) {
+				//
+				FrameTimeMs = Date.now();
+				//
 				fpscounter = fpscounter+1;
+				// console.log('delta:' + deltatime);
+				deltatime = (FrameTimeMs-lastFrameTimeMs)/1000*60;
+				lastFrameTimeMs = Date.now();
 				then = now - (delta % interval);
-
 				//runs every frame 
-				drawMovingBlock(movingBlockArray[0][arrayPos[0]], movingBlockArray[0][arrayPos[0]-1], 'red', movingBlockArray[0].length, 0, 8);
+				drawMovingBlock(movingBlockArray[0][arrayPos[0]], movingBlockArray[0][arrayPos[0]-1], 'red', movingBlockArray[0].length, 0, Math.round(fps/7.5));
 				animatecharacter();
 				checkCollision();
 			}
@@ -149,21 +158,21 @@
 
 		//movement
 		function animatecharacter() {
-            ctx.clearRect(player.x, player.y, player.size, player.size);
+            ctx.clearRect(Math.floor(player.x), Math.floor(player.y), Math.floor(player.size), Math.floor(player.size));
 			if (keys.w == true) {
-				player.y = player.y - player.move;
+				player.y = player.y - player.move*deltatime;
 			}
 			if (keys.s == true) {
-				player.y = player.y + player.move;
+				player.y = player.y + player.move*deltatime;
 			}
 			if (keys.a == true) {
-				player.x = player.x - player.move;
+				player.x = player.x - player.move*deltatime;
 			}
 			if (keys.d == true) {
-				player.x = player.x + player.move;
+				player.x = player.x + player.move*deltatime;
 			}
 			ctx.fillStyle = player.color;
-			ctx.fillRect(player.x, player.y, player.size, player.size);
+			ctx.fillRect(Math.floor(player.x), Math.floor(player.y), player.size, player.size);
 		}
 
 		//colision logic
@@ -206,7 +215,7 @@
 		}
         window.level = nextlevel;
 
-		//block that moves to all array positions
+		//block that moves to all array positions (thats a lot of inputs past me what the f**k where you thinking)
 		let blockY;
 		let blockX;
 		let prevBlockY;
@@ -227,7 +236,7 @@
 				arrayPos[posInArray] = 0;
 			}
 			
-			smoother[posInArray] = smoother[posInArray] + 1;
+			smoother[posInArray] = smoother[posInArray] + 1
 			if (smoother[posInArray] == blockSpeed){
 				smoother[posInArray] = 0;
 				arrayPos[posInArray] = arrayPos[posInArray] + 1;
@@ -239,7 +248,7 @@
 		}
 	});
 
-	// todo: fix 1 frame despawn, fix hitbox by using game.blocklength instead of arraynum
+	// todo: fix 1 frame despawn of moving block, fix hitbox by using game.blocklength instead of arraynum
 </script>
 
 <canvas bind:this={canvas} id="gameboard" />
