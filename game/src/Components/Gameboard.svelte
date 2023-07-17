@@ -126,7 +126,7 @@
 		let fpscounter = 0;
 		let arrayPos = [0];
 		let smoother = [0];
-		let movingBlockArray = [[0,1,2,3,4,5,6,5,4,3,2,1,0]];
+		let movingBlockArray = [[1,81,161,81,1]];
 		let deltatime = 1;
 
 		let lastFrameTimeMs = Date.now();
@@ -221,7 +221,9 @@
 		let prevBlockY;
 		let prevBlockX;
 		function drawMovingBlock (blockpos, previousBlockpos, blockColor, moveLength, posInArray, blockSpeed){
-			ctx.clearRect(prevBlockX*game.blocklength, prevBlockY*game.blocklength, game.blocklength, game.blocklength); // I made clearrect work with trial and error and im proud of it... I banged my head on this for like 30 minutes WHY DOES IT WORK NOW WTF
+			if (arrayPos[posInArray] != 0){ 
+				ctx.clearRect(prevBlockX*game.blocklength, prevBlockY*game.blocklength, game.blocklength, game.blocklength); // I made clearrect work with trial and error and im proud of it... I banged my head on this for like 30 minutes WHY DOES IT WORK NOW WTF
+			}
 			mapgen[previousBlockpos] = 0;
 
 			blockY = Math.floor(blockpos/game.w);
@@ -232,23 +234,23 @@
 			ctx.fillStyle = blockColor;
 			ctx.fillRect((prevBlockX+(blockX-prevBlockX)/blockSpeed*smoother[posInArray])*game.blocklength, (prevBlockY+(blockY-prevBlockY)/blockSpeed*smoother[posInArray])*game.blocklength, game.blocklength, game.blocklength);
 			mapgen[blockpos] = 1;
+			console.log(arrayPos[posInArray]);
 			if (arrayPos[posInArray] == moveLength){
+
 				arrayPos[posInArray] = 0;
 			}
-			
-			smoother[posInArray] = smoother[posInArray] + 1
-			if (smoother[posInArray] == blockSpeed){
+			smoother[posInArray] = smoother[posInArray] + 1;
+			if (smoother[posInArray] > blockSpeed){
 				smoother[posInArray] = 0;
 				arrayPos[posInArray] = arrayPos[posInArray] + 1;
 			}
-
 			if(blockX < player.x + game.blocklength && blockX + game.blocklength > player.x && blockY < player.y + game.blocklength && game.blocklength + blockY > player.y) {
 				alert('hi');
 			}
 		}
 	});
 
-	// todo: fix 1 frame despawn of moving block, fix hitbox by using game.blocklength instead of arraynum
+	// fix hitbox by using game.blocklength instead of arraynum
 </script>
 
 <canvas bind:this={canvas} id="gameboard" />
