@@ -60,7 +60,7 @@
 
 		//Drawing unmoving
 		function drawMap() {
-            ctx.clearRect(0, 0, game.w * game.blocklength, game.h * game.blocklength);
+			ctx.clearRect(0, 0, game.w * game.blocklength, game.h * game.blocklength);
 			for (var y = 0; y < game.h; y++) {
 				for (var x = 0; x < game.w; x++) {
 					switch (mapgen[y * game.w + x]) {
@@ -124,31 +124,38 @@
 		let interval = 1000 / fps;
 		let delta;
 		let fpscounter = 0;
-		let arrayPos = [0];
+		let posInMovesetArray = [0];
 		let smoother = [0];
-		let movingBlockArray = [[1,81,161,81,1]];
+		let movingBlockArray = [[1, 2, 3, 4, 5, 6, 86, 166, 165, 164, 163, 162, 161, 81, 1]];
 		let deltatime = 1;
 
 		let lastFrameTimeMs = Date.now();
 		let FrameTimeMs;
 		setInterval(() => {
-		        // console.log('fps:' + fpscounter);
-		        fpscounter = 0;
-		    }, 1000);
-		function gameloop() { 
+			console.clear();
+			console.table({FPS:fpscounter, Choose_Level:"window.level(Level)"});
+			fpscounter = 0;
+		}, 1000);
+		function gameloop() {
 			now = Date.now();
 			delta = now - then;
 			if (delta > interval) {
 				//
 				FrameTimeMs = Date.now();
 				//
-				fpscounter = fpscounter+1;
-				// console.log('delta:' + deltatime);
-				deltatime = (FrameTimeMs-lastFrameTimeMs)/1000*60;
+				fpscounter = fpscounter + 1;
+				deltatime = ((FrameTimeMs - lastFrameTimeMs) / 1000) * 60;
 				lastFrameTimeMs = Date.now();
 				then = now - (delta % interval);
-				//runs every frame 
-				drawMovingBlock(movingBlockArray[0][arrayPos[0]], movingBlockArray[0][arrayPos[0]-1], 'red', movingBlockArray[0].length-1, 0, Math.round(fps/7.5));
+				//runs every frame
+				drawMovingBlock(
+					movingBlockArray[0][posInMovesetArray[0]],
+					movingBlockArray[0][posInMovesetArray[0] - 1],
+					'red',
+					movingBlockArray[0].length - 1,
+					0,
+					Math.round(fps / 7.5)
+				);
 				animatecharacter();
 				checkCollision();
 			}
@@ -158,18 +165,23 @@
 
 		//movement
 		function animatecharacter() {
-            ctx.clearRect(Math.floor(player.x), Math.floor(player.y), Math.floor(player.size), Math.floor(player.size));
+			ctx.clearRect(
+				Math.floor(player.x),
+				Math.floor(player.y),
+				Math.floor(player.size),
+				Math.floor(player.size)
+			);
 			if (keys.w == true) {
-				player.y = player.y - player.move*deltatime;
+				player.y = player.y - player.move * deltatime;
 			}
 			if (keys.s == true) {
-				player.y = player.y + player.move*deltatime;
+				player.y = player.y + player.move * deltatime;
 			}
 			if (keys.a == true) {
-				player.x = player.x - player.move*deltatime;
+				player.x = player.x - player.move * deltatime;
 			}
 			if (keys.d == true) {
-				player.x = player.x + player.move*deltatime;
+				player.x = player.x + player.move * deltatime;
 			}
 			ctx.fillStyle = player.color;
 			ctx.fillRect(Math.floor(player.x), Math.floor(player.y), player.size, player.size);
@@ -213,42 +225,62 @@
 			drawMap();
 			spawnplayer();
 		}
-        window.level = nextlevel;
+		window.level = nextlevel;
 
 		//block that moves to all array positions (thats a lot of inputs past me what the f**k where you thinking)
 		let blockY;
 		let blockX;
 		let prevBlockY;
 		let prevBlockX;
-		function drawMovingBlock (blockpos, previousBlockpos, blockColor, moveLength, posInArray, blockSpeed){
-			ctx.clearRect(prevBlockX*game.blocklength, prevBlockY*game.blocklength, game.blocklength, game.blocklength); // I made clearrect work with trial and error and im proud of it... I banged my head on this for like 30 minutes WHY DOES IT WORK NOW WTF
-			mapgen[previousBlockpos] = 0;
+		let exactBlockPosition = {
+			x: 0,
+			y: 0
+		};
+		function drawMovingBlock(
+			blockpos,
+			previousBlockpos,
+			blockColor,
+			moveLength,
+			posInArray,
+			blockSpeed
+		) {
+			ctx.clearRect(
+				prevBlockX * game.blocklength,
+				prevBlockY * game.blocklength,
+				game.blocklength,
+				game.blocklength
+			); // I made clearrect work with trial and error and im proud of it... I banged my head on this for like 30 minutes WHY DOES IT WORK NOW WTF
 
-			blockY = Math.floor(blockpos/game.w);
+			//positions
+			blockY = Math.floor(blockpos / game.w);
 			blockX = blockpos - blockY * game.w;
-			prevBlockY = Math.floor(previousBlockpos/game.w);
+			prevBlockY = Math.floor(previousBlockpos / game.w);
 			prevBlockX = previousBlockpos - prevBlockY * game.w;
+			exactBlockPosition.x =
+				(prevBlockX + ((blockX - prevBlockX) / blockSpeed) * smoother[posInArray]) *
+				game.blocklength;
+			exactBlockPosition.y =
+				(prevBlockY + ((blockY - prevBlockY) / blockSpeed) * smoother[posInArray]) *
+				game.blocklength;
 
+			//filling
 			ctx.fillStyle = blockColor;
-			ctx.fillRect((prevBlockX+(blockX-prevBlockX)/blockSpeed*smoother[posInArray])*game.blocklength, (prevBlockY+(blockY-prevBlockY)/blockSpeed*smoother[posInArray])*game.blocklength, game.blocklength, game.blocklength);
-			mapgen[blockpos] = 1;
-			// console.log(arrayPos[posInArray]);
+			ctx.fillRect(exactBlockPosition.x, exactBlockPosition.y, game.blocklength, game.blocklength);
 			smoother[posInArray] = smoother[posInArray] + 1;
-			if (arrayPos[posInArray] == moveLength && smoother[posInArray] > blockSpeed){
-				arrayPos[posInArray] = 0;
+			if (posInMovesetArray[posInArray] == moveLength && smoother[posInArray] > blockSpeed) {
+				posInMovesetArray[posInArray] = 0;
 			}
-			if (smoother[posInArray] > blockSpeed){
+			if (smoother[posInArray] > blockSpeed) {
 				smoother[posInArray] = 0;
-				arrayPos[posInArray] = arrayPos[posInArray] + 1;
+				posInMovesetArray[posInArray] = posInMovesetArray[posInArray] + 1;
 			}
-			console.log (movingBlockArray[0][arrayPos[posInArray]] + " " + arrayPos[0] + ' ' + moveLength + ' ' + smoother[0]);
-			if(
-			player.x < blockX + game.blocklength &&
-			player.x + game.blocklength > blockX &&
-			player.y < blockY + game.blocklength &&
-			player.y + game.blocklength > blockY
-			){
-				console.log('hi');
+			if (
+				player.x < exactBlockPosition.x + game.blocklength &&
+				player.x + game.blocklength > exactBlockPosition.x &&
+				player.y < exactBlockPosition.y + game.blocklength &&
+				player.y + game.blocklength > exactBlockPosition.y
+			) {
+				spawnplayer();
 			}
 		}
 	});
