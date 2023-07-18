@@ -147,14 +147,13 @@
 				deltatime = ((FrameTimeMs - lastFrameTimeMs) / 1000) * 60;
 				lastFrameTimeMs = Date.now();
 				then = now - (delta % interval);
-				//runs every frame
 				drawMovingBlock(
-					movingBlockArray[0][posInMovesetArray[0]],
-					movingBlockArray[0][posInMovesetArray[0] - 1],
-					'red',
-					movingBlockArray[0].length - 1,
-					0,
-					Math.round(fps / 7.5)
+					movingBlockArray[0][posInMovesetArray[0]], //blockpos
+					movingBlockArray[0][posInMovesetArray[0] - 1], //previousBlockpos
+					'red', //blockColor
+					movingBlockArray[0].length - 1, //moveLength
+					0, //blockIndex
+					Math.round(fps / 7.5) //blockSpeed
 				);
 				animatecharacter();
 				checkCollision();
@@ -241,7 +240,7 @@
 			previousBlockpos,
 			blockColor,
 			moveLength,
-			posInArray,
+			blockIndex,
 			blockSpeed
 		) {
 			ctx.clearRect(
@@ -257,22 +256,22 @@
 			prevBlockY = Math.floor(previousBlockpos / game.w);
 			prevBlockX = previousBlockpos - prevBlockY * game.w;
 			exactBlockPosition.x =
-				(prevBlockX + ((blockX - prevBlockX) / blockSpeed) * smoother[posInArray]) *
+				(prevBlockX + ((blockX - prevBlockX) / blockSpeed) * smoother[blockIndex]) *
 				game.blocklength;
 			exactBlockPosition.y =
-				(prevBlockY + ((blockY - prevBlockY) / blockSpeed) * smoother[posInArray]) *
+				(prevBlockY + ((blockY - prevBlockY) / blockSpeed) * smoother[blockIndex]) *
 				game.blocklength;
 
 			//filling
 			ctx.fillStyle = blockColor;
 			ctx.fillRect(exactBlockPosition.x, exactBlockPosition.y, game.blocklength, game.blocklength);
-			smoother[posInArray] = smoother[posInArray] + 1;
-			if (posInMovesetArray[posInArray] == moveLength && smoother[posInArray] > blockSpeed) {
-				posInMovesetArray[posInArray] = 0;
+			smoother[blockIndex] = smoother[blockIndex] + 1;
+			if (posInMovesetArray[blockIndex] == moveLength && smoother[blockIndex] > blockSpeed) {
+				posInMovesetArray[blockIndex] = 0;
 			}
-			if (smoother[posInArray] > blockSpeed) {
-				smoother[posInArray] = 0;
-				posInMovesetArray[posInArray] = posInMovesetArray[posInArray] + 1;
+			if (smoother[blockIndex] > blockSpeed) {
+				smoother[blockIndex] = 0;
+				posInMovesetArray[blockIndex] = posInMovesetArray[blockIndex] + 1;
 			}
 			if (
 				player.x < exactBlockPosition.x + game.blocklength &&
