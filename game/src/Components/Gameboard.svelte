@@ -132,7 +132,7 @@
 		let lastFrameTimeMs = Date.now();
 		let FrameTimeMs;
 		setInterval(() => {
-		        console.log('fps:' + fpscounter);
+		        // console.log('fps:' + fpscounter);
 		        fpscounter = 0;
 		    }, 1000);
 		function gameloop() { 
@@ -148,7 +148,7 @@
 				lastFrameTimeMs = Date.now();
 				then = now - (delta % interval);
 				//runs every frame 
-				drawMovingBlock(movingBlockArray[0][arrayPos[0]], movingBlockArray[0][arrayPos[0]-1], 'red', movingBlockArray[0].length, 0, Math.round(fps/7.5));
+				drawMovingBlock(movingBlockArray[0][arrayPos[0]], movingBlockArray[0][arrayPos[0]-1], 'red', movingBlockArray[0].length-1, 0, Math.round(fps/7.5));
 				animatecharacter();
 				checkCollision();
 			}
@@ -221,9 +221,7 @@
 		let prevBlockY;
 		let prevBlockX;
 		function drawMovingBlock (blockpos, previousBlockpos, blockColor, moveLength, posInArray, blockSpeed){
-			if (arrayPos[posInArray] != 0){ 
-				ctx.clearRect(prevBlockX*game.blocklength, prevBlockY*game.blocklength, game.blocklength, game.blocklength); // I made clearrect work with trial and error and im proud of it... I banged my head on this for like 30 minutes WHY DOES IT WORK NOW WTF
-			}
+			ctx.clearRect(prevBlockX*game.blocklength, prevBlockY*game.blocklength, game.blocklength, game.blocklength); // I made clearrect work with trial and error and im proud of it... I banged my head on this for like 30 minutes WHY DOES IT WORK NOW WTF
 			mapgen[previousBlockpos] = 0;
 
 			blockY = Math.floor(blockpos/game.w);
@@ -234,18 +232,23 @@
 			ctx.fillStyle = blockColor;
 			ctx.fillRect((prevBlockX+(blockX-prevBlockX)/blockSpeed*smoother[posInArray])*game.blocklength, (prevBlockY+(blockY-prevBlockY)/blockSpeed*smoother[posInArray])*game.blocklength, game.blocklength, game.blocklength);
 			mapgen[blockpos] = 1;
-			console.log(arrayPos[posInArray]);
-			if (arrayPos[posInArray] == moveLength){
-
+			// console.log(arrayPos[posInArray]);
+			smoother[posInArray] = smoother[posInArray] + 1;
+			if (arrayPos[posInArray] == moveLength && smoother[posInArray] > blockSpeed){
 				arrayPos[posInArray] = 0;
 			}
-			smoother[posInArray] = smoother[posInArray] + 1;
 			if (smoother[posInArray] > blockSpeed){
 				smoother[posInArray] = 0;
 				arrayPos[posInArray] = arrayPos[posInArray] + 1;
 			}
-			if(blockX < player.x + game.blocklength && blockX + game.blocklength > player.x && blockY < player.y + game.blocklength && game.blocklength + blockY > player.y) {
-				alert('hi');
+			console.log (movingBlockArray[0][arrayPos[posInArray]] + " " + arrayPos[0] + ' ' + moveLength + ' ' + smoother[0]);
+			if(
+			player.x < blockX + game.blocklength &&
+			player.x + game.blocklength > blockX &&
+			player.y < blockY + game.blocklength &&
+			player.y + game.blocklength > blockY
+			){
+				console.log('hi');
 			}
 		}
 	});
