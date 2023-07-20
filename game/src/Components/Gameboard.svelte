@@ -2,9 +2,10 @@
 	import { onMount } from 'svelte';
 	import { get } from 'svelte/store';
 	import * as stores from './levels.js';
-	import wall1 from "./Sprites/test.png";
-	import wall2 from "./Sprites/wall2.png";
-	import wall3 from "./Sprites/wall3.png";
+	import wall_roof from "./Sprites/wall_roof.png";
+	import wall_bottom from "./Sprites/wall_bottom.png";	
+	import wall_side from "./Sprites/wall_side.png";
+	import wall_top from "./Sprites/wall_top.png";
 
 	//map
 	let level = 0;
@@ -77,16 +78,16 @@
 				for (var x = 0; x < game.w; x++) {
 					switch (mapgen[y * game.w + x]) {
 						case 1:
-							ctx.fillStyle = "black";
-							ctx.fillRect(
+							ctx.drawImage(
+								document.getElementById("wall_roof"),
 								x * game.blocklength,
 								y * game.blocklength,
 								game.blocklength,
 								game.blocklength
 							);
 							if (mapgen[(y-1) * game.w + x] == 0){
-								ctx.fillStyle = "orange";
-								ctx.fillRect(
+								ctx.drawImage(
+								document.getElementById("wall_top"),
 								x * game.blocklength,
 								y * game.blocklength,
 								game.blocklength,
@@ -94,8 +95,8 @@
 							);
 							}
 							if (mapgen[(y+1) * game.w + x] == 0){
-								ctx.fillStyle = "orange";
-								ctx.fillRect(
+								ctx.drawImage(
+								document.getElementById("wall_bottom"),
 								x * game.blocklength,
 								(y + 0.5) * game.blocklength,
 								game.blocklength,
@@ -103,8 +104,8 @@
 							);
 							}
 							if (mapgen[y * game.w + x - 1] == 0){
-								ctx.fillStyle = "orange";
 								ctx.fillRect(
+								document.getElementById("wall_side"),
 								x * game.blocklength,
 								y * game.blocklength,
 								game.blocklength/4,
@@ -112,8 +113,8 @@
 							);
 							}
 							if (mapgen[y * game.w + x + 1] == 0){
-								ctx.fillStyle = "orange";
 								ctx.fillRect(
+								document.getElementById("wall_side"),
 								(x + 0.75)* game.blocklength,
 								y * game.blocklength,
 								game.blocklength/4,
@@ -365,9 +366,10 @@
 
 <canvas bind:this={canvas} id="gameboard" />
 <svelte:window on:keydown={handleKeyDown} on:keyup={handlekeyUp} />
-<img src={wall1} alt="wall" id="wallBlock1" style="display:none;"/>
-<img src={wall2} alt="wall" id="wallBlock2" style="display:none;"/>
-<img src={wall3} alt="wall" id="wallBlock3" style="display:none;"/>
+<img src={wall_bottom} alt="wall" id="wall_bottom" style="display:none;"/>
+<img src={wall_roof} alt="wall" id="wall_roof" style="display:none;"/>
+<img src={wall_side} alt="wall" id="wall_side" style="display:none;"/>
+<img src={wall_top} alt="wall" id="wall_top" style="display:none;"/>
 <style>
 	#gameboard {
 		width: 80rem;
