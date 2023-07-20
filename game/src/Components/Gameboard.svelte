@@ -2,6 +2,9 @@
 	import { onMount } from 'svelte';
 	import { get } from 'svelte/store';
 	import * as stores from './levels.js';
+	import wall1 from "./Sprites/test.png";
+	import wall2 from "./Sprites/wall2.png";
+	import wall3 from "./Sprites/wall3.png";
 
 	//map
 	let level = 0;
@@ -37,9 +40,9 @@
 	onMount(() => {
 		let ctx = canvas.getContext('2d');
 		let size = canvas.getBoundingClientRect();
-		canvas.width = size.width * 10;
-		canvas.height = size.height * 10;
-		ctx.scale(10, 10);
+		canvas.width = size.width * 8;
+		canvas.height = size.height * 8;
+		ctx.scale(8, 8);
 
 		//blocklength
 		game.blocklength = size.width / game.w;
@@ -66,21 +69,57 @@
 			element.map((innerArray) => innerArray.map((coord) => coord[1] * game.w + coord[0]))
 		);
 		function drawMap() {
+			ctx.clearRect(0, 0, game.w * game.blocklength, game.h * game.blocklength);
 			mapgen = allmaps[level];
 			blockgen = allblocks[level];
 			addpropgen = addallblocks[level];
-			ctx.clearRect(0, 0, game.w * game.blocklength, game.h * game.blocklength);
 			for (var y = 0; y < game.h; y++) {
 				for (var x = 0; x < game.w; x++) {
 					switch (mapgen[y * game.w + x]) {
 						case 1:
-							ctx.fillStyle = 'black';
+							ctx.fillStyle = "black";
 							ctx.fillRect(
 								x * game.blocklength,
 								y * game.blocklength,
 								game.blocklength,
 								game.blocklength
 							);
+							if (mapgen[(y-1) * game.w + x] == 0){
+								ctx.fillStyle = "orange";
+								ctx.fillRect(
+								x * game.blocklength,
+								y * game.blocklength,
+								game.blocklength,
+								game.blocklength/4
+							);
+							}
+							if (mapgen[(y+1) * game.w + x] == 0){
+								ctx.fillStyle = "orange";
+								ctx.fillRect(
+								x * game.blocklength,
+								(y + 0.5) * game.blocklength,
+								game.blocklength,
+								game.blocklength/2
+							);
+							}
+							if (mapgen[y * game.w + x - 1] == 0){
+								ctx.fillStyle = "orange";
+								ctx.fillRect(
+								x * game.blocklength,
+								y * game.blocklength,
+								game.blocklength/4,
+								game.blocklength
+							);
+							}
+							if (mapgen[y * game.w + x + 1] == 0){
+								ctx.fillStyle = "orange";
+								ctx.fillRect(
+								(x + 0.75)* game.blocklength,
+								y * game.blocklength,
+								game.blocklength/4,
+								game.blocklength
+							);
+							}
 							break;
 						case -1:
 							ctx.fillStyle = 'red';
@@ -133,8 +172,6 @@
 		let interval = 1000 / fps;
 		let delta;
 		let fpscounter = 0;
-		let posInMovesetArray = [];
-		let smoother = [];
 		let deltatime = 1;
 
 		let lastFrameTimeMs = Date.now();
@@ -160,12 +197,12 @@
 				then = now - (delta % interval);
 				blockgen.forEach((element, index) => {
 					drawMovingBlock(
-					blockgen[index][posInMovesetArray[index]], //blockpos
-					blockgen[index][posInMovesetArray[index] - 1], //previousBlockpos
-					addpropgen[index].color, //blockColor
-					element.length - 1, //moveLength
-					index, //blockIndex
-					Math.round(fps / addpropgen[index].speed) //blockSpeed
+						blockgen[index][posInMovesetArray[index]], //blockpos
+						blockgen[index][posInMovesetArray[index] - 1], //previousBlockpos
+						addpropgen[index].color, //blockColor
+						element.length - 1, //moveLength
+						index, //blockIndex
+						Math.round(fps / addpropgen[index].speed) //blockSpeed
 					);
 				});
 				animatecharacter();
@@ -177,26 +214,25 @@
 
 		//movement
 		function animatecharacter() {
-			ctx.clearRect(
-				Math.floor(player.x),
-				Math.floor(player.y),
-				Math.floor(player.size),
-				Math.floor(player.size)
-			);
+			ctx.clearRect(player.x, player.y, player.size, player.size);
 			if (keys.w == true) {
 				player.y = player.y - player.move * deltatime;
+				player.y = Math.round(player.y);
 			}
 			if (keys.s == true) {
 				player.y = player.y + player.move * deltatime;
+				player.y = Math.round(player.y);
 			}
 			if (keys.a == true) {
 				player.x = player.x - player.move * deltatime;
+				player.x = Math.round(player.x);
 			}
 			if (keys.d == true) {
 				player.x = player.x + player.move * deltatime;
+				player.x = Math.round(player.x);
 			}
 			ctx.fillStyle = player.color;
-			ctx.fillRect(Math.floor(player.x), Math.floor(player.y), player.size, player.size);
+			ctx.fillRect(player.x, player.y, player.size, player.size);
 		}
 
 		//colision logic
@@ -233,16 +269,16 @@
 
 		function nextlevel(level) {
 			console.log('level:' + level);
-			drawMap();
 			spawnplayer();
+			posInMovesetArray = [];
+			smoother = [];
+			exactBlockPosition = [];
 		}
 		window.level = nextlevel;
 
 		//block that moves to all array positions (thats a lot of inputs past me what the f**k where you thinking)
-		let blockY;
-		let blockX;
-		let prevBlockY;
-		let prevBlockX;
+		let posInMovesetArray = [];
+		let smoother = [];
 		let exactBlockPosition = [];
 		// The ungodly demon
 		function drawMovingBlock(
@@ -253,9 +289,28 @@
 			blockIndex,
 			blockSpeed
 		) {
-			if (!smoother[blockIndex]){smoother[blockIndex] = 0;}
-			if (!posInMovesetArray[blockIndex]){posInMovesetArray[blockIndex] = 0;}
-			if (!exactBlockPosition[blockIndex]){exactBlockPosition[blockIndex] = {x: 0, y:0};}
+			let blockY;
+			let blockX;
+			let prevBlockY;
+			let prevBlockX;
+			if (!smoother[blockIndex]) {
+				smoother[blockIndex] = 0;
+			}
+			if (!posInMovesetArray[blockIndex]) {
+				posInMovesetArray[blockIndex] = 0;
+			}
+			if (!exactBlockPosition[blockIndex]) {
+				exactBlockPosition[blockIndex] = {
+					x: Math.floor(
+						(prevBlockX + ((blockX - prevBlockX) / blockSpeed) * smoother[blockIndex]) *
+							game.blocklength
+					),
+					y: Math.floor(
+						(prevBlockY + ((blockY - prevBlockY) / blockSpeed) * smoother[blockIndex]) *
+							game.blocklength
+					)
+				};
+			}
 			ctx.fillStyle = 'green';
 			ctx.clearRect(
 				exactBlockPosition[blockIndex].x,
@@ -263,22 +318,29 @@
 				game.blocklength,
 				game.blocklength
 			);
-			
+
 			//positions
 			blockY = Math.floor(blockpos / game.w);
 			blockX = blockpos - blockY * game.w;
 			prevBlockY = Math.floor(previousBlockpos / game.w);
 			prevBlockX = previousBlockpos - prevBlockY * game.w;
-			exactBlockPosition[blockIndex].x =
+			exactBlockPosition[blockIndex].x = Math.floor(
 				(prevBlockX + ((blockX - prevBlockX) / blockSpeed) * smoother[blockIndex]) *
-				game.blocklength;
-			exactBlockPosition[blockIndex].y =
+					game.blocklength
+			);
+			exactBlockPosition[blockIndex].y = Math.floor(
 				(prevBlockY + ((blockY - prevBlockY) / blockSpeed) * smoother[blockIndex]) *
-				game.blocklength;
+					game.blocklength
+			);
 
 			//filling
 			ctx.fillStyle = blockColor;
-			ctx.fillRect(exactBlockPosition[blockIndex].x, exactBlockPosition[blockIndex].y, game.blocklength, game.blocklength);
+			ctx.fillRect(
+				exactBlockPosition[blockIndex].x,
+				exactBlockPosition[blockIndex].y,
+				game.blocklength,
+				game.blocklength
+			);
 			smoother[blockIndex] = smoother[blockIndex] + 1;
 			if (posInMovesetArray[blockIndex] == moveLength && smoother[blockIndex] > blockSpeed) {
 				posInMovesetArray[blockIndex] = 0;
@@ -288,10 +350,10 @@
 				posInMovesetArray[blockIndex] = posInMovesetArray[blockIndex] + 1;
 			}
 			if (
-				player.x+1 < exactBlockPosition[blockIndex].x + game.blocklength &&
-				player.x-1 + game.blocklength > exactBlockPosition[blockIndex].x &&
-				player.y+1 < exactBlockPosition[blockIndex].y + game.blocklength &&
-				player.y-1 + game.blocklength > exactBlockPosition[blockIndex].y
+				player.x + 1 < exactBlockPosition[blockIndex].x + game.blocklength &&
+				player.x - 1 + game.blocklength > exactBlockPosition[blockIndex].x &&
+				player.y + 1 < exactBlockPosition[blockIndex].y + game.blocklength &&
+				player.y - 1 + game.blocklength > exactBlockPosition[blockIndex].y
 			) {
 				spawnplayer();
 			}
@@ -303,7 +365,9 @@
 
 <canvas bind:this={canvas} id="gameboard" />
 <svelte:window on:keydown={handleKeyDown} on:keyup={handlekeyUp} />
-
+<img src={wall1} alt="wall" id="wallBlock1" style="display:none;"/>
+<img src={wall2} alt="wall" id="wallBlock2" style="display:none;"/>
+<img src={wall3} alt="wall" id="wallBlock3" style="display:none;"/>
 <style>
 	#gameboard {
 		width: 80rem;
