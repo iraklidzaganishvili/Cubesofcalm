@@ -6,7 +6,7 @@
 	import wall_bottom from './Sprites/wall_bottom.png';
 	import wall_side from './Sprites/wall_side.png';
 	import wall_top from './Sprites/wall_top.png';
-	import grass from './Sprites/grass.png';
+	import grass from './Sprites/biggrass.png';
 	import goal from './Sprites/water.png';
 	import character from './Sprites/character.png';
 	//map
@@ -45,8 +45,8 @@
 
 		let ctx = canvas.getContext('2d');
 		let size = canvas.getBoundingClientRect();
-		canvas.width = size.width*8;
-		canvas.height = size.height*8;
+		canvas.width = size.width * 8;
+		canvas.height = size.height * 8;
 		// camera.height = size.height;
 		// camera.height = size.width;
 		//Background image
@@ -85,10 +85,15 @@
 				}
 			}
 		}
-		
 		function drawMap() {
-
 			ctx.clearRect(0, 0, game.w * game.blocklength, game.h * game.blocklength);
+			ctx.drawImage(
+				document.getElementById('grass'),
+				0,
+				0,
+				game.w * game.blocklength,
+				game.h * game.blocklength
+			);
 			mapgen = allmaps[level];
 			blockgen = allblocks[level];
 			addpropgen = addallblocks[level];
@@ -177,7 +182,7 @@
 			player.y = spawn.y;
 			drawMap();
 			keys = { w: false, a: false, s: false, d: false };
-			console.log("e")
+			console.log('e');
 		}
 		//gameloop
 		let fps = 60;
@@ -372,17 +377,16 @@
 				spawnplayer();
 			}
 		}
-		function cameraMovement(){
+		function cameraMovement() {
 			// if (player.x > camera.x+game.blocklength*2){
 			// 	console.log (player.x, camera.x);
 			// 	ctx.setTransform(32, 0, 0, 32, spawn.x+game.blocklength*2, -spawn.y * 16);
 			// 	camera.x = spawn.x+game.blocklength*2;
 			// }
 			// ctx.setTransform(32, 0, 0, 32, -(spawn.x + 100)* 24, -spawn.y * 24);
-			ctx.setTransform(32, 0, 0, 32, -player.x*24, -player.y*24);
+			ctx.setTransform(32, 0, 0, 32, -player.x * 24, -player.y * 24);
 			drawMap();
 		}
-
 	});
 </script>
 
