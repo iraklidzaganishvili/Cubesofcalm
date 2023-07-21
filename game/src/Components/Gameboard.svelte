@@ -47,6 +47,8 @@
 		let size = canvas.getBoundingClientRect();
 		canvas.width = size.width*8;
 		canvas.height = size.height*8;
+		// camera.height = size.height;
+		// camera.height = size.width;
 		//Background image
 		canvas.style.backgroundImage = `url(${grass})`;
 
@@ -79,11 +81,13 @@
 			for (var x = 0; x < game.w; x++) {
 				if (mapgen[y * game.w + x] == -1) {
 					spawn = { x: x * game.blocklength, y: y * game.blocklength };
-					ctx.setTransform(24, 0, 0, 24, -spawn.x*16, -spawn.y * 16);
+					ctx.setTransform(32, 0, 0, 32, -spawn.x * 24, -spawn.y * 24);
 				}
 			}
 		}
+		
 		function drawMap() {
+
 			ctx.clearRect(0, 0, game.w * game.blocklength, game.h * game.blocklength);
 			mapgen = allmaps[level];
 			blockgen = allblocks[level];
@@ -173,6 +177,7 @@
 			player.y = spawn.y;
 			drawMap();
 			keys = { w: false, a: false, s: false, d: false };
+			console.log("e")
 		}
 		//gameloop
 		let fps = 60;
@@ -205,6 +210,7 @@
 				lastFrameTimeMs = Date.now();
 				then = now - (delta % interval);
 				blockgen.forEach((element, index) => {
+					cameraMovement();
 					drawMovingBlock(
 						blockgen[index][posInMovesetArray[index]], //blockpos
 						blockgen[index][posInMovesetArray[index] - 1], //previousBlockpos
@@ -366,9 +372,18 @@
 				spawnplayer();
 			}
 		}
-	});
+		function cameraMovement(){
+			// if (player.x > camera.x+game.blocklength*2){
+			// 	console.log (player.x, camera.x);
+			// 	ctx.setTransform(32, 0, 0, 32, spawn.x+game.blocklength*2, -spawn.y * 16);
+			// 	camera.x = spawn.x+game.blocklength*2;
+			// }
+			// ctx.setTransform(32, 0, 0, 32, -(spawn.x + 100)* 24, -spawn.y * 24);
+			ctx.setTransform(32, 0, 0, 32, -player.x*24, -player.y*24);
+			drawMap();
+		}
 
-	// fix hitbox by using game.blocklength instead of arraynum
+	});
 </script>
 
 <canvas bind:this={canvas} id="gameboard" />
@@ -379,6 +394,7 @@
 <img src={wall_top} alt="wall" id="wall_top" style="display:none;" />
 <img src={goal} alt="wall" id="goal" style="display:none;" />
 <img src={character} alt="wall" id="character" style="display:none;" />
+<img src={grass} alt="wall" id="grass" style="display:none;" />
 
 <style>
 	#gameboard {
