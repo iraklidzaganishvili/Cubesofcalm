@@ -2,11 +2,13 @@
 	import { onMount } from 'svelte';
 	import { get } from 'svelte/store';
 	import * as stores from './levels.js';
-	import wall_roof from "./Sprites/wall_roof.png";
-	import wall_bottom from "./Sprites/wall_bottom.png";	
-	import wall_side from "./Sprites/wall_side.png";
-	import wall_top from "./Sprites/wall_top.png";
-
+	import wall_roof from './Sprites/wall_roof.png';
+	import wall_bottom from './Sprites/wall_bottom.png';
+	import wall_side from './Sprites/wall_side.png';
+	import wall_top from './Sprites/wall_top.png';
+	import grass from './Sprites/grass.png';
+	import goal from './Sprites/water.png';
+	import character from './Sprites/character.png';
 	//map
 	let level = 0;
 	let allmaps = get(stores.mapgen).maps;
@@ -15,8 +17,8 @@
 	let mapgen;
 	let blockgen;
 	let addpropgen;
-
 	let canvas;
+
 	function handleKeyDown(event) {
 		keys[event.key] = true;
 	}
@@ -39,11 +41,14 @@
 		blocklength: 0
 	};
 	onMount(() => {
+		let characterImage = document.getElementById('character');
+
 		let ctx = canvas.getContext('2d');
 		let size = canvas.getBoundingClientRect();
-		canvas.width = size.width * 8;
-		canvas.height = size.height * 8;
-		ctx.scale(8, 8);
+		canvas.width = size.width*8;
+		canvas.height = size.height*8;
+		//Background image
+		canvas.style.backgroundImage = `url(${grass})`;
 
 		//blocklength
 		game.blocklength = size.width / game.w;
@@ -69,6 +74,15 @@
 		allblocks = allblocks.map((element) =>
 			element.map((innerArray) => innerArray.map((coord) => coord[1] * game.w + coord[0]))
 		);
+		mapgen = allmaps[level];
+		for (var y = 0; y < game.h; y++) {
+			for (var x = 0; x < game.w; x++) {
+				if (mapgen[y * game.w + x] == -1) {
+					spawn = { x: x * game.blocklength, y: y * game.blocklength };
+					ctx.setTransform(24, 0, 0, 24, -spawn.x*16, -spawn.y * 16);
+				}
+			}
+		}
 		function drawMap() {
 			ctx.clearRect(0, 0, game.w * game.blocklength, game.h * game.blocklength);
 			mapgen = allmaps[level];
@@ -79,62 +93,56 @@
 					switch (mapgen[y * game.w + x]) {
 						case 1:
 							ctx.drawImage(
-								document.getElementById("wall_roof"),
+								document.getElementById('wall_roof'),
 								x * game.blocklength,
 								y * game.blocklength,
 								game.blocklength,
 								game.blocklength
 							);
-							if (mapgen[(y-1) * game.w + x] == 0){
+							if (mapgen[y * game.w + x - 1] < 1) {
 								ctx.drawImage(
-								document.getElementById("wall_top"),
-								x * game.blocklength,
-								y * game.blocklength,
-								game.blocklength,
-								game.blocklength/4
-							);
+									document.getElementById('wall_side'),
+									x * game.blocklength,
+									y * game.blocklength,
+									game.blocklength / 4,
+									game.blocklength
+								);
 							}
-							if (mapgen[(y+1) * game.w + x] == 0){
+							if (mapgen[y * game.w + x + 1] < 1) {
 								ctx.drawImage(
-								document.getElementById("wall_bottom"),
-								x * game.blocklength,
-								(y + 0.5) * game.blocklength,
-								game.blocklength,
-								game.blocklength/2
-							);
+									document.getElementById('wall_side'),
+									(x + 0.75) * game.blocklength,
+									y * game.blocklength,
+									game.blocklength / 4,
+									game.blocklength
+								);
 							}
-							if (mapgen[y * game.w + x - 1] == 0){
-								ctx.fillRect(
-								document.getElementById("wall_side"),
-								x * game.blocklength,
-								y * game.blocklength,
-								game.blocklength/4,
-								game.blocklength
-							);
+							if (mapgen[(y + 1) * game.w + x] < 1) {
+								ctx.drawImage(
+									document.getElementById('wall_bottom'),
+									x * game.blocklength,
+									(y + 0.5) * game.blocklength,
+									game.blocklength,
+									game.blocklength / 2
+								);
 							}
-							if (mapgen[y * game.w + x + 1] == 0){
-								ctx.fillRect(
-								document.getElementById("wall_side"),
-								(x + 0.75)* game.blocklength,
-								y * game.blocklength,
-								game.blocklength/4,
-								game.blocklength
-							);
+							if (mapgen[(y - 1) * game.w + x] < 1) {
+								ctx.drawImage(
+									document.getElementById('wall_top'),
+									x * game.blocklength,
+									y * game.blocklength,
+									game.blocklength,
+									game.blocklength / 4
+								);
 							}
 							break;
 						case -1:
-							ctx.fillStyle = 'red';
-							ctx.fillRect(
-								x * game.blocklength,
-								y * game.blocklength,
-								game.blocklength,
-								game.blocklength
-							);
 							spawn = { x: x * game.blocklength, y: y * game.blocklength };
 							break;
 						case -2:
 							ctx.fillStyle = 'blue';
-							ctx.fillRect(
+							ctx.drawImage(
+								document.getElementById('goal'),
 								x * game.blocklength,
 								y * game.blocklength,
 								game.blocklength,
@@ -159,7 +167,7 @@
 		//spawn
 		function spawnplayer() {
 			ctx.fillStyle = player.color;
-			ctx.fillRect(spawn.x, spawn.y, player.size, player.size);
+			ctx.drawImage(characterImage, spawn.x, spawn.y, player.size, player.size);
 			ctx.clearRect(player.x, player.y, player.size, player.size);
 			player.x = spawn.x;
 			player.y = spawn.y;
@@ -178,10 +186,10 @@
 		let lastFrameTimeMs = Date.now();
 		let FrameTimeMs;
 		setInterval(() => {
-			console.clear();
+			// console.clear();
 			console.table({
 				FPS: fpscounter,
-				Choose_Level: 'window.level(Level)',
+				Choose_Level: 'window.level(Level)'
 			});
 			fpscounter = 0;
 		}, 1000);
@@ -233,7 +241,7 @@
 				player.x = Math.round(player.x);
 			}
 			ctx.fillStyle = player.color;
-			ctx.fillRect(player.x, player.y, player.size, player.size);
+			ctx.drawImage(characterImage, player.x, player.y, player.size, player.size);
 		}
 
 		//colision logic
@@ -312,7 +320,6 @@
 					)
 				};
 			}
-			ctx.fillStyle = 'green';
 			ctx.clearRect(
 				exactBlockPosition[blockIndex].x,
 				exactBlockPosition[blockIndex].y,
@@ -366,10 +373,13 @@
 
 <canvas bind:this={canvas} id="gameboard" />
 <svelte:window on:keydown={handleKeyDown} on:keyup={handlekeyUp} />
-<img src={wall_bottom} alt="wall" id="wall_bottom" style="display:none;"/>
-<img src={wall_roof} alt="wall" id="wall_roof" style="display:none;"/>
-<img src={wall_side} alt="wall" id="wall_side" style="display:none;"/>
-<img src={wall_top} alt="wall" id="wall_top" style="display:none;"/>
+<img src={wall_bottom} alt="wall" id="wall_bottom" style="display:none;" />
+<img src={wall_roof} alt="wall" id="wall_roof" style="display:none;" />
+<img src={wall_side} alt="wall" id="wall_side" style="display:none;" />
+<img src={wall_top} alt="wall" id="wall_top" style="display:none;" />
+<img src={goal} alt="wall" id="goal" style="display:none;" />
+<img src={character} alt="wall" id="character" style="display:none;" />
+
 <style>
 	#gameboard {
 		width: 80rem;
@@ -378,6 +388,6 @@
 		left: 50%;
 		top: 50%;
 		transform: translate(-50%, -50%);
-		background-color: aquamarine;
+		background-repeat: repeat;
 	}
 </style>
