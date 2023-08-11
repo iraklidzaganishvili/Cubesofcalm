@@ -76,18 +76,15 @@
 		allblocks = allblocks.map((element) =>
 			element.map((innerArray) => innerArray.map((coord) => coord[1] * game.w + coord[0]))
 		);
-		// let spawnarr;
-		// mapgen = allmaps[level];
-		// for (var y = 0; y < game.h; y++) {
-		// 	for (var x = 0; x < game.w; x++) {
-		// 		if (mapgen[y * game.w + x] == -1) {
-		// 			spawnarr = {x: x, y: y};
-		// 			ctx.setTransform(32, 0, 0, 32, -spawn.x * 32, -spawn.y * 32);
-		// 		}
-		// 	}
-		// }
-		// console.log(spawnarr.x-5);
+		mapgen = allmaps[level];
 		ctx.scale(32, 32);
+		for (var y = 0; y < game.h; y++) {
+			for (var x = 0; x < game.w; x++) {
+				if (mapgen[y * game.w + x] == -1) {
+					ctx.setTransform(32, 0, 0, 32, -x*game.blocklength*32+size.width*4, -y*game.blocklength*32+size.height*4);
+				}
+			}
+		}
 		function drawMap() {
 			ctx.clearRect(0, 0, game.w * game.blocklength, game.h * game.blocklength);
 			ctx.drawImage(
@@ -194,6 +191,8 @@
 		let delta;
 		let fpscounter = 0;
 		let deltatime = 1;
+		let transformX;
+		let transformY;
 
 		let lastFrameTimeMs = Date.now();
 		let FrameTimeMs;
@@ -222,16 +221,19 @@
 
 				//Actual game loop
 
-				//Camera
-				if (player.x*32 > size.width*28){
-					console.log("gi");
+				// Camera
+				if (player.x*32 <= size.width*28 && player.x*32 >= size.width*4){
+					transformX = -player.x*32+size.width*4;
 				}
+				if (player.y*32 <= size.height*28 && player.y*32 >= size.height*4){
+					transformY = -player.y*32+size.height*4;
+				}
+				ctx.setTransform(32, 0, 0, 32, transformX, transformY);
 				delagger = delagger + 1;
 				if (delagger == 2){
 					delagger = 0;
 					drawMap();
 				}
-				ctx.setTransform(32, 0, 0, 32, -player.x*32+size.width*4, -player.y*32+size.height*4);
 				
 				//Moving block
 				blockgen.forEach((element, index) => {
@@ -254,7 +256,6 @@
 		//movement
 		function animatecharacter() {
 			// ctx.clearRect(player.x, player.y, player.size, player.size);
-			console.log(player.y);
 			if (keys.w == true) {
 				player.y = player.y - player.move;
 				player.y = Math.round(player.y);
