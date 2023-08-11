@@ -76,15 +76,17 @@
 		allblocks = allblocks.map((element) =>
 			element.map((innerArray) => innerArray.map((coord) => coord[1] * game.w + coord[0]))
 		);
+		// let spawnarr;
 		// mapgen = allmaps[level];
 		// for (var y = 0; y < game.h; y++) {
 		// 	for (var x = 0; x < game.w; x++) {
 		// 		if (mapgen[y * game.w + x] == -1) {
-		// 			spawn = { x: x * game.blocklength, y: y * game.blocklength };
+		// 			spawnarr = {x: x, y: y};
 		// 			ctx.setTransform(32, 0, 0, 32, -spawn.x * 32, -spawn.y * 32);
 		// 		}
 		// 	}
 		// }
+		// console.log(spawnarr.x-5);
 		ctx.scale(32, 32);
 		function drawMap() {
 			ctx.clearRect(0, 0, game.w * game.blocklength, game.h * game.blocklength);
@@ -195,6 +197,8 @@
 
 		let lastFrameTimeMs = Date.now();
 		let FrameTimeMs;
+
+		let delagger = 0;
 		setInterval(() => {
 			// console.clear();
 			console.table({
@@ -212,6 +216,7 @@
 				//
 				fpscounter = fpscounter + 1;
 				deltatime = ((FrameTimeMs - lastFrameTimeMs) / 1000) * 60;
+				// deltatime = 
 				lastFrameTimeMs = Date.now();
 				then = now - (delta % interval);
 
@@ -219,10 +224,14 @@
 
 				//Camera
 				if (player.x*32 > size.width*28){
-						console.log("gi");
-					}
-					ctx.setTransform(32, 0, 0, 32, -player.x*32+size.width*4, -player.y*32+size.height*4);
+					console.log("gi");
+				}
+				delagger = delagger + 1;
+				if (delagger == 2){
+					delagger = 0;
 					drawMap();
+				}
+				ctx.setTransform(32, 0, 0, 32, -player.x*32+size.width*4, -player.y*32+size.height*4);
 				
 				//Moving block
 				blockgen.forEach((element, index) => {
@@ -244,21 +253,22 @@
 
 		//movement
 		function animatecharacter() {
-			ctx.clearRect(player.x, player.y, player.size, player.size);
+			// ctx.clearRect(player.x, player.y, player.size, player.size);
+			console.log(player.y);
 			if (keys.w == true) {
-				player.y = player.y - player.move * deltatime;
+				player.y = player.y - player.move;
 				player.y = Math.round(player.y);
 			}
 			if (keys.s == true) {
-				player.y = player.y + player.move * deltatime;
+				player.y = player.y + player.move;
 				player.y = Math.round(player.y);
 			}
 			if (keys.a == true) {
-				player.x = player.x - player.move * deltatime;
+				player.x = player.x - player.move;
 				player.x = Math.round(player.x);
 			}
 			if (keys.d == true) {
-				player.x = player.x + player.move * deltatime;
+				player.x = player.x + player.move;
 				player.x = Math.round(player.x);
 			}
 			ctx.fillStyle = player.color;
